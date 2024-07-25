@@ -18,16 +18,21 @@ public abstract class TurnManager {
 		return player == this.getTurn();
 	}
 
-	public final void switchTurnAndAnnounce() {
+	public final void switchTurnAndPlayEffects() {
 		if (this.switchTurn()) {
-			this.announceNextTurn();
+			this.playNextTurnEffects();
 		}
 	}
 
-	public final void announceNextTurn() {
+	public final void playNextTurnEffects() {
 		Text nextTurnMessage = this.getNextTurnMessage();
 		if (nextTurnMessage != null) {
 			this.phase.getGameSpace().getPlayers().sendMessage(nextTurnMessage);
+		}
+
+		ServerPlayerEntity turn = this.getTurn();
+		if (turn != null) {
+			TurnSounds.playTurnSounds(turn);
 		}
 	}
 

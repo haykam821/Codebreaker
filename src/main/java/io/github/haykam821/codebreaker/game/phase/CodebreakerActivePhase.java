@@ -96,7 +96,7 @@ public class CodebreakerActivePhase {
 
 			if (this.turnManager == null) {
 				this.turnManager = config.createTurnManager(this, player);
-				this.turnManager.announceNextTurn();
+				this.turnManager.playNextTurnEffects();
 			}
 		}
 	}
@@ -160,7 +160,7 @@ public class CodebreakerActivePhase {
 
 			this.endGame();
 		} else {
-			this.turnManager.switchTurnAndAnnounce();
+			this.turnManager.switchTurnAndPlayEffects();
 			this.gameSpace.getPlayers().playSound(SoundEvents.BLOCK_CHEST_LOCKED, SoundCategory.BLOCKS, 1, 1);
 		}
 
@@ -239,7 +239,7 @@ public class CodebreakerActivePhase {
 
 	private void onPlayerRemove(ServerPlayerEntity player) {
 		if (!this.isGameEnding() && this.players.remove(player) && !this.players.isEmpty()) {
-			this.turnManager.switchTurnAndAnnounce();
+			this.turnManager.switchTurnAndPlayEffects();
 		}
 	}
 
