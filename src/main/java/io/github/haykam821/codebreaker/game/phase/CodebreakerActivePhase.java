@@ -238,7 +238,7 @@ public class CodebreakerActivePhase {
 	}
 
 	private void onPlayerRemove(ServerPlayerEntity player) {
-		if (this.players.remove(player) && !this.players.isEmpty()) {
+		if (!this.isGameEnding() && this.players.remove(player) && !this.players.isEmpty()) {
 			this.turnManager.switchTurnAndAnnounce();
 		}
 	}
