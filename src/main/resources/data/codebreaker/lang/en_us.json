@@ -8,5 +8,6 @@
 	"text.codebreaker.win": "%s won the game after %s rounds.",
 	"text.codebreaker.other_turn": "It is currently %s's turn.",
 	"text.codebreaker.next_turn": "It is now %s's turn.",
+	"text.codebreaker.no_duplicate_pegs": "This color has already been used!",
 	"text.codebreaker.no_turn": "There is no player with the turn."
 }

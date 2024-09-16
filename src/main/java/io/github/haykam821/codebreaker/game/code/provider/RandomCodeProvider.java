@@ -47,6 +47,11 @@ public class RandomCodeProvider implements CodeProvider {
 	}
 
 	@Override
+	public boolean hasDuplicatePegs(CodebreakerConfig config) {
+		return this.spaces > config.getCodePegs().size();
+	}
+
+	@Override
 	public Codec<RandomCodeProvider> getCodec() {
 		return CODEC;
 	}

@@ -15,6 +15,7 @@ public interface CodeProvider {
 	public static final MapCodec<CodeProvider> TYPE_CODEC = REGISTRY.dispatchMap(CodeProvider::getCodec, Function.identity());
 	
 	public Code generate(Random random, CodebreakerConfig config);
+	public boolean hasDuplicatePegs(CodebreakerConfig config);
 
 	public Codec<? extends CodeProvider> getCodec();
 }

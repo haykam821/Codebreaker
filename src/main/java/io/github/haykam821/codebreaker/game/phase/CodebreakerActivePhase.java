@@ -46,21 +46,26 @@ public class CodebreakerActivePhase {
 	private final CodebreakerConfig config;
 	private final HolderAttachment guideText;
 	private final List<ServerPlayerEntity> players;
+
 	private final Code correctCode;
+	private final boolean duplicatePegs;
+
 	private Code queuedCode;
 	private int queuedIndex = 0;
 	private TurnManager turnManager;
 	private int ticks = 0;
 	private int ticksUntilClose = -1;
 
-	public CodebreakerActivePhase(GameSpace gameSpace, ServerWorld world, CodebreakerMap map, CodebreakerConfig config, HolderAttachment guideText, List<ServerPlayerEntity> players, Code correctCode) {
+	public CodebreakerActivePhase(GameSpace gameSpace, ServerWorld world, CodebreakerMap map, CodebreakerConfig config, HolderAttachment guideText, List<ServerPlayerEntity> players, Code correctCode, boolean duplicatePegs) {
 		this.gameSpace = gameSpace;
 		this.world = world;
 		this.map = map;
 		this.config = config;
 		this.guideText = guideText;
 		this.players = players;
+
 		this.correctCode = correctCode;
+		this.duplicatePegs = duplicatePegs;
 	}
 
 	public static void setRules(GameActivity activity) {
@@ -72,8 +77,8 @@ public class CodebreakerActivePhase {
 		activity.deny(GameRuleType.THROW_ITEMS);
 	}
 
-	public static void open(GameSpace gameSpace, ServerWorld world, CodebreakerMap map, CodebreakerConfig config, HolderAttachment guide, Code correctCode) {
-		CodebreakerActivePhase phase = new CodebreakerActivePhase(gameSpace, world, map, config, guide, Lists.newArrayList(gameSpace.getPlayers()), correctCode);
+	public static void open(GameSpace gameSpace, ServerWorld world, CodebreakerMap map, CodebreakerConfig config, HolderAttachment guide, Code correctCode, boolean duplicatePegs) {
+		CodebreakerActivePhase phase = new CodebreakerActivePhase(gameSpace, world, map, config, guide, Lists.newArrayList(gameSpace.getPlayers()), correctCode, duplicatePegs);
 
 		gameSpace.setActivity(activity -> {
 			CodebreakerActivePhase.setRules(activity);
@@ -177,12 +182,18 @@ public class CodebreakerActivePhase {
 		player.playSound(SoundEvents.BLOCK_NOTE_BLOCK_BIT.value(), SoundCategory.BLOCKS, 1, 0.5f);
 	}
 
-	private void queueCodePeg(ServerPlayerEntity player, BlockState state) {
+	private boolean tryQueueCodePeg(ServerPlayerEntity player, BlockState state) {
 		if (this.queuedCode == null) {
 			this.createQueuedCode();
 		}
-		this.queuedCode.setNext(state);
-		player.playSound(SoundEvents.BLOCK_NOTE_BLOCK_BIT.value(), SoundCategory.BLOCKS, 1, 2);
+
+		if (this.queuedCode.setNext(state, this.duplicatePegs)) {
+			player.playSound(SoundEvents.BLOCK_NOTE_BLOCK_BIT.value(), SoundCategory.BLOCKS, 1, 2);
+			return true;
+		}
+
+		player.sendMessage(Text.translatable("text.codebreaker.no_duplicate_pegs").formatted(Formatting.RED), false);
+		return false;
 	}
 
 	private ActionResult onUseBlock(ServerPlayerEntity player, Hand hand, BlockHitResult hitResult) {
@@ -213,8 +224,8 @@ public class CodebreakerActivePhase {
 	
 		if (state.isOf(Blocks.BEDROCK)) {
 			this.eraseQueuedCode(player);
-		} else {
-			this.queueCodePeg(player, state);
+		} else if (!this.tryQueueCodePeg(player, state)) {
+			return false;
 		}
 
 		if (this.queuedCode.isCompletelyFilled()) {

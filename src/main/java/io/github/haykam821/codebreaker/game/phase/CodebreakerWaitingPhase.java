@@ -43,15 +43,20 @@ public class CodebreakerWaitingPhase {
 	private final ServerWorld world;
 	private final CodebreakerMap map;
 	private final CodebreakerConfig config;
+
 	private final Code correctCode;
+	private final boolean duplicatePegs;
+
 	private HolderAttachment guideText;
 
-	public CodebreakerWaitingPhase(GameSpace gameSpace, ServerWorld world, CodebreakerMap map, CodebreakerConfig config, Code correctCode) {
+	public CodebreakerWaitingPhase(GameSpace gameSpace, ServerWorld world, CodebreakerMap map, CodebreakerConfig config, Code correctCode, boolean duplicatePegs) {
 		this.gameSpace = gameSpace;
 		this.world = world;
 		this.map = map;
 		this.config = config;
+
 		this.correctCode = correctCode;
+		this.duplicatePegs = duplicatePegs;
 	}
 
 	public static GameOpenProcedure open(GameOpenContext<CodebreakerConfig> context) {
@@ -59,6 +64,7 @@ public class CodebreakerWaitingPhase {
 		CodebreakerConfig config = context.config();
 
 		Code correctCode = config.getCodeProvider().generate(random, config);
+		boolean duplicatePegs = config.getCodeProvider().hasDuplicatePegs(config);
 
 		CodebreakerMapBuilder mapBuilder = new CodebreakerMapBuilder(config);
 		CodebreakerMap map = mapBuilder.create(random, correctCode, config.getCodePegs());
@@ -67,7 +73,7 @@ public class CodebreakerWaitingPhase {
 			.setGenerator(map.createGenerator(context.server()));
 
 		return context.openWithWorld(worldConfig, (activity, world) -> {
-			CodebreakerWaitingPhase waiting = new CodebreakerWaitingPhase(activity.getGameSpace(), world, map, config, correctCode);
+			CodebreakerWaitingPhase waiting = new CodebreakerWaitingPhase(activity.getGameSpace(), world, map, config, correctCode, duplicatePegs);
 
 			GameWaitingLobby.addTo(activity, config.getPlayerConfig());
 			CodebreakerActivePhase.setRules(activity);
@@ -89,7 +95,7 @@ public class CodebreakerWaitingPhase {
 	}
 
 	public GameResult requestStart() {
-		CodebreakerActivePhase.open(this.gameSpace, this.world, this.map, this.config, this.guideText, this.correctCode);
+		CodebreakerActivePhase.open(this.gameSpace, this.world, this.map, this.config, this.guideText, this.correctCode, this.duplicatePegs);
 		return GameResult.ok();
 	}
 

@@ -29,13 +29,22 @@ public class Code {
 		return this.pegs.length;
 	}
 
-	public void setNext(BlockState state) {
+	/**
+	 * @return whether the inserted peg would be a duplicate and duplicate pegs are not allowed
+	 */
+	public boolean setNext(BlockState state, boolean allowDuplicatePegs) {
 		for (int index = 0; index < this.getLength(); index++) {
-			if (this.pegs[index] == null) {
+			BlockState peg = this.pegs[index];
+
+			if (peg == null) {
 				this.pegs[index] = state;
-				return;
+				return true;
+			} else if (peg == state && !allowDuplicatePegs) {
+				return false;
 			}
 		}
+
+		return true;
 	}
 
 	public boolean isCompletelyFilled() {
