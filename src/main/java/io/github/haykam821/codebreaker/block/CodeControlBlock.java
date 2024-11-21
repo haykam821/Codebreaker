@@ -2,6 +2,8 @@ package io.github.haykam821.codebreaker.block;
 
 import java.util.Optional;
 
+import com.mojang.serialization.MapCodec;
+
 import eu.pb4.polymer.core.api.block.PolymerBlock;
 import io.github.haykam821.codebreaker.Main;
 import net.minecraft.block.Block;
@@ -27,6 +29,8 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 
 public class CodeControlBlock extends BlockWithEntity implements PolymerBlock {
+	public static final MapCodec<CodeControlBlock> CODEC = Block.createCodec(CodeControlBlock::new);
+
 	public static final DirectionProperty FACING = Properties.HORIZONTAL_FACING;
 
 	public CodeControlBlock(Block.Settings settings) {
@@ -90,6 +94,11 @@ public class CodeControlBlock extends BlockWithEntity implements PolymerBlock {
 
 	@Override
 	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
-		return world.isClient() ? null : checkType(type, Main.CODE_CONTROL_BLOCK_ENTITY, CodeControlBlockEntity::tick);
+		return world.isClient() ? null : validateTicker(type, Main.CODE_CONTROL_BLOCK_ENTITY, CodeControlBlockEntity::tick);
+	}
+
+	@Override
+	protected MapCodec<? extends CodeControlBlock> getCodec() {
+		return CODEC;
 	}
 }
