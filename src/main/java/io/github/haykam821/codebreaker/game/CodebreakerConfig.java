@@ -1,6 +1,7 @@
 package io.github.haykam821.codebreaker.game;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import io.github.haykam821.codebreaker.game.code.provider.CodeProvider;
@@ -17,12 +18,12 @@ import net.minecraft.registry.entry.RegistryEntryList;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.intprovider.ConstantIntProvider;
 import net.minecraft.util.math.intprovider.IntProvider;
-import xyz.nucleoid.plasmid.game.common.config.PlayerConfig;
+import xyz.nucleoid.plasmid.api.game.common.config.WaitingLobbyConfig;
 
 public class CodebreakerConfig {
-	public static final Codec<CodebreakerConfig> CODEC = RecordCodecBuilder.create(instance -> {
+	public static final MapCodec<CodebreakerConfig> CODEC = RecordCodecBuilder.mapCodec(instance -> {
 		return instance.group(
-			PlayerConfig.CODEC.fieldOf("players").forGetter(CodebreakerConfig::getPlayerConfig),
+			WaitingLobbyConfig.CODEC.fieldOf("players").forGetter(CodebreakerConfig::getPlayerConfig),
 			CodebreakerMapConfig.CODEC.optionalFieldOf("map", CodebreakerMapConfig.DEFAULT).forGetter(CodebreakerConfig::getMapConfig),
 			CodeProvider.TYPE_CODEC.fieldOf("code_provider").forGetter(CodebreakerConfig::getCodeProvider),
 			RegistryCodecs.entryList(RegistryKeys.BLOCK).fieldOf("code_pegs").forGetter(config -> config.codePegs),
@@ -33,7 +34,7 @@ public class CodebreakerConfig {
 		).apply(instance, CodebreakerConfig::new);
 	});
 
-	private final PlayerConfig playerConfig;
+	private final WaitingLobbyConfig playerConfig;
 	private final CodebreakerMapConfig mapConfig;
 	private final CodeProvider codeProvider;
 	private final RegistryEntryList<Block> codePegs;
@@ -42,7 +43,7 @@ public class CodebreakerConfig {
 	private final int chances;
 	private final boolean turns;
 
-	public CodebreakerConfig(PlayerConfig playerConfig, CodebreakerMapConfig mapConfig, CodeProvider codeProvider, RegistryEntryList<Block> codePegs, IntProvider ticksUntilClose, int guideTicks, int chances, boolean turns) {
+	public CodebreakerConfig(WaitingLobbyConfig playerConfig, CodebreakerMapConfig mapConfig, CodeProvider codeProvider, RegistryEntryList<Block> codePegs, IntProvider ticksUntilClose, int guideTicks, int chances, boolean turns) {
 		this.playerConfig = playerConfig;
 		this.mapConfig = mapConfig;
 		this.codeProvider = codeProvider;
@@ -53,7 +54,7 @@ public class CodebreakerConfig {
 		this.turns = turns;
 	}
 
-	public PlayerConfig getPlayerConfig() {
+	public WaitingLobbyConfig getPlayerConfig() {
 		return this.playerConfig;
 	}
 

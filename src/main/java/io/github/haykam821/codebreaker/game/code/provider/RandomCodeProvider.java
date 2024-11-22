@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import io.github.haykam821.codebreaker.game.CodebreakerConfig;
@@ -15,7 +16,7 @@ import net.minecraft.registry.entry.RegistryEntryList;
 import net.minecraft.util.math.random.Random;
 
 public class RandomCodeProvider implements CodeProvider {
-	public static final Codec<RandomCodeProvider> CODEC = RecordCodecBuilder.create(instance -> {
+	public static final MapCodec<RandomCodeProvider> CODEC = RecordCodecBuilder.mapCodec(instance -> {
 		return instance.group(
 			Codec.INT.fieldOf("spaces").forGetter(provider -> provider.spaces)
 		).apply(instance, RandomCodeProvider::new);
@@ -52,7 +53,7 @@ public class RandomCodeProvider implements CodeProvider {
 	}
 
 	@Override
-	public Codec<RandomCodeProvider> getCodec() {
+	public MapCodec<RandomCodeProvider> getCodec() {
 		return CODEC;
 	}
 

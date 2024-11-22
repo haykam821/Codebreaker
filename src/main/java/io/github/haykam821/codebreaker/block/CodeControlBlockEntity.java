@@ -12,9 +12,9 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtHelper;
-import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryEntryLookup;
 import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -59,16 +59,16 @@ public class CodeControlBlockEntity extends BlockEntity {
 	}
 
 	@Override
-	public void readNbt(NbtCompound nbt) {
-		super.readNbt(nbt);
+	protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registries) {
+		super.readNbt(nbt, registries);
 
-		RegistryEntryLookup<Block> registryWrapper = this.world == null ? Registries.BLOCK.getReadOnlyWrapper() : this.world.createCommandRegistryWrapper(RegistryKeys.BLOCK);
+		RegistryEntryLookup<Block> registryWrapper = registries.getOrThrow(RegistryKeys.BLOCK);
 		this.block = NbtHelper.toBlockState(registryWrapper, nbt.getCompound(BLOCK_KEY));
 	}
 
 	@Override
-	protected void writeNbt(NbtCompound nbt) {
-		super.writeNbt(nbt);
+	protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registries) {
+		super.writeNbt(nbt, registries);
 		nbt.put(BLOCK_KEY, NbtHelper.fromBlockState(this.block));
 	}
 

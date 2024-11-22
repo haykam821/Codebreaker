@@ -8,6 +8,7 @@ import io.github.haykam821.codebreaker.game.code.Code;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.entry.RegistryEntryList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -43,7 +44,7 @@ public class CodebreakerMapBuilder {
 		this.config = config;
 	}
 
-	public CodebreakerMap create(Random random, Code correctCode, RegistryEntryList<Block> codePegs) {
+	public CodebreakerMap create(Random random, Code correctCode, RegistryWrapper.WrapperLookup registries, RegistryEntryList<Block> codePegs) {
 		MapTemplate template = MapTemplate.createEmpty();
 
 		CodebreakerMapConfig mapConfig = this.config.getMapConfig();
@@ -87,7 +88,7 @@ public class CodebreakerMapBuilder {
 			blockEntity.setBlock(getCodeControlBlock(codePegs, codeControlIndex));
 
 			template.setBlockState(pos, CODE_CONTROL);
-			template.setBlockEntity(pos, blockEntity);
+			template.setBlockEntity(pos, blockEntity, registries);
 
 			codeControlIndex += 1;
 		}

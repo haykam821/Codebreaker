@@ -19,7 +19,7 @@ import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.state.StateManager;
-import net.minecraft.state.property.DirectionProperty;
+import net.minecraft.state.property.EnumProperty;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
@@ -27,11 +27,12 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
+import xyz.nucleoid.packettweaker.PacketContext;
 
 public class CodeControlBlock extends BlockWithEntity implements PolymerBlock {
 	public static final MapCodec<CodeControlBlock> CODEC = Block.createCodec(CodeControlBlock::new);
 
-	public static final DirectionProperty FACING = Properties.HORIZONTAL_FACING;
+	public static final EnumProperty<Direction> FACING = Properties.HORIZONTAL_FACING;
 
 	public CodeControlBlock(Block.Settings settings) {
 		super(settings);
@@ -40,21 +41,17 @@ public class CodeControlBlock extends BlockWithEntity implements PolymerBlock {
 	}
 
 	@Override
-	public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+	public ActionResult onUseWithItem(ItemStack stack, BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
 		Optional<CodeControlBlockEntity> maybeBlockEntity = world.getBlockEntity(pos, Main.CODE_CONTROL_BLOCK_ENTITY);
 
 		if (maybeBlockEntity.isPresent()) {
 			CodeControlBlockEntity blockEntity = maybeBlockEntity.get();
 
-			if (blockEntity.getBlock().isAir()) {
-				ItemStack stack = player.getStackInHand(hand);
+			if (blockEntity.getBlock().isAir() && stack.getItem() instanceof BlockItem blockItem) {
+				BlockState block = blockItem.getBlock().getDefaultState();
+				blockEntity.setBlock(block);
 
-				if (stack.getItem() instanceof BlockItem blockItem) {
-					BlockState block = blockItem.getBlock().getDefaultState();
-					blockEntity.setBlock(block);
-
-					return ActionResult.SUCCESS;
-				}
+				return ActionResult.SUCCESS_SERVER;
 			}
 		}
 
@@ -62,13 +59,8 @@ public class CodeControlBlock extends BlockWithEntity implements PolymerBlock {
 	}
 
 	@Override
-	public Block getPolymerBlock(BlockState state) {
-		return Blocks.LECTERN;
-	}
-
-	@Override
-	public BlockState getPolymerBlockState(BlockState state) {
-		return this.getPolymerBlock(state).getDefaultState().with(FACING, state.get(FACING));
+	public BlockState getPolymerBlockState(BlockState state, PacketContext context) {
+		return Blocks.LECTERN.getDefaultState().with(FACING, state.get(FACING));
 	}
 
 	@Override

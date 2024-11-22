@@ -20,7 +20,7 @@ public final class TurnSounds {
 
 	private static void playTurnSound(ServerPlayerEntity player, float index) {
 		float pitch = TURN_SOUND_BASE_PITCH + TURN_SOUND_PITCH_STEP * index;
-		player.playSound(TURN_SOUND, TURN_SOUND_CATEGORY, TURN_SOUND_VOLUME, pitch);
+		player.playSoundToPlayer(TURN_SOUND, TURN_SOUND_CATEGORY, TURN_SOUND_VOLUME, pitch);
 	}
 
 	protected static void playTurnSounds(ServerPlayerEntity player) {
